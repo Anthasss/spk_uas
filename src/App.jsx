@@ -1,14 +1,18 @@
 import "./App.css";
-import { House, Scale } from "lucide-react";
+import { House, Scale, UserRound } from "lucide-react";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
+import CriteriaPage from "./pages/CriteriaPage";
+import AlternativePage from "./pages/AlternativePage";
 
 function App() {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: <House />, path: "/" },
     { id: "criteria", label: "Kriteria", icon: <Scale />, path: "/criteria" },
+    { id: "alternative", label: "Alternatif", icon: <UserRound />, path: "/alternative" },
   ];
 
   return (
@@ -56,9 +60,14 @@ function App() {
                 path="/"
                 element={<Dashboard />}
               />
-              {/* <Route path="/faq" element={<FAQPage />} /> */}
-              {/* <Route path="/profile" element={<Profile />} /> */}
-              {/* <Route path="/settings" element={<Settings />} /> */}
+              <Route
+                path="/criteria"
+                element={<CriteriaPage />}
+              />
+              <Route
+                path="/alternative"
+                element={<AlternativePage />}
+              />
             </Routes>
           </main>
         </div>
