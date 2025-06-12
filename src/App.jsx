@@ -1,40 +1,72 @@
 import "./App.css";
+import { House, Scale } from "lucide-react";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./components/Dashboard";
 
 function App() {
+  const menuItems = [
+    { id: "dashboard", label: "Dashboard", icon: <House />, path: "/" },
+    { id: "criteria", label: "Kriteria", icon: <Scale />, path: "/criteria" },
+  ];
+
   return (
-    <>
-      <div className="collapse bg-base-100 border border-base-300">
+    <Router>
+      <div className="drawer lg:drawer-open">
         <input
-          type="radio"
-          name="my-accordion-1"
-          defaultChecked
+          id="my-drawer"
+          type="checkbox"
+          className="drawer-toggle"
         />
-        <div className="collapse-title font-semibold">How do I create an account?</div>
-        <div className="collapse-content text-sm">
-          Click the "Sign Up" button in the top right corner and follow the registration process.
+
+        {/* Main content */}
+        <div className="drawer-content flex flex-col">
+          {/* Navbar for smaller screen */}
+          <div className="navbar bg-base-300 lg:hidden">
+            <div className="flex-none">
+              <label
+                htmlFor="my-drawer"
+                className="btn btn-square btn-ghost"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </label>
+            </div>
+            <div className="flex-1">
+              <span className="text-xl font-bold">My App</span>
+            </div>
+          </div>
+
+          {/* Page content */}
+          <main className="flex-1 bg-base-100">
+            <Routes>
+              <Route
+                path="/"
+                element={<Dashboard />}
+              />
+              {/* <Route path="/faq" element={<FAQPage />} /> */}
+              {/* <Route path="/profile" element={<Profile />} /> */}
+              {/* <Route path="/settings" element={<Settings />} /> */}
+            </Routes>
+          </main>
         </div>
+
+        {/* Sidebar */}
+        <Sidebar menuItems={menuItems} />
       </div>
-      <div className="collapse bg-base-100 border border-base-300">
-        <input
-          type="radio"
-          name="my-accordion-1"
-        />
-        <div className="collapse-title font-semibold">I forgot my password. What should I do?</div>
-        <div className="collapse-content text-sm">
-          Click on "Forgot Password" on the login page and follow the instructions sent to your email.
-        </div>
-      </div>
-      <div className="collapse bg-base-100 border border-base-300">
-        <input
-          type="radio"
-          name="my-accordion-1"
-        />
-        <div className="collapse-title font-semibold">How do I update my profile information?</div>
-        <div className="collapse-content text-sm">
-          Go to "My Account" settings and select "Edit Profile" to make changes.
-        </div>
-      </div>
-    </>
+    </Router>
   );
 }
 
