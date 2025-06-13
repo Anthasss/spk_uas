@@ -1,19 +1,30 @@
 import { useState } from "react";
+import { createCriteria } from "../../services/criteriaService";
 
 export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
   const [criteriaName, setCriteriaName] = useState("");
   const [criteriaWeight, setCriteriaWeight] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (criteriaName.trim() && criteriaWeight > 0) {
-      onSave({
-        nama: criteriaName.trim(),
-        bobot: parseFloat(criteriaWeight),
-      });
-      // Reset form
-      setCriteriaName("");
-      setCriteriaWeight(0);
-      onClose();
+      try {
+        setLoading(true);
+        const newCriteria = await createCriteria({
+          name: criteriaName.trim(),
+          weight: parseFloat(criteriaWeight),
+        });
+        onSave(newCriteria);
+        // Reset form
+        setCriteriaName("");
+        setCriteriaWeight(0);
+        onClose();
+      } catch (error) {
+        console.error("Error creating criteria:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -42,6 +53,7 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
               className="input input-bordered w-full"
               value={criteriaName}
               onChange={(e) => setCriteriaName(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -59,6 +71,7 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
               className="input input-bordered w-full"
               value={criteriaWeight}
               onChange={(e) => setCriteriaWeight(e.target.value)}
+              disabled={loading}
             />
             <label className="label">
               <span className="label-text-alt">Value between 0.0 - 1.0</span>
@@ -70,15 +83,16 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
             <button
               className="btn btn-ghost"
               onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               className="btn btn-primary"
               onClick={handleSave}
-              disabled={!criteriaName.trim() || criteriaWeight <= 0}
+              disabled={!criteriaName.trim() || criteriaWeight <= 0 || loading}
             >
-              Save
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
             </button>
           </div>
         </div>

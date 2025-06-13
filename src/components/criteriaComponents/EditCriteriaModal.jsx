@@ -1,30 +1,42 @@
 import { useState, useEffect } from "react";
+import { updateCriteria } from "../../services/criteriaService";
 
 export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria }) {
   const [criteriaName, setCriteriaName] = useState("");
   const [criteriaWeight, setCriteriaWeight] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Set initial values when criteria prop changes
   useEffect(() => {
     if (criteria) {
-      setCriteriaName(criteria.nama);
-      setCriteriaWeight(criteria.bobot);
+      setCriteriaName(criteria.name || criteria.nama);
+      setCriteriaWeight(criteria.weight || criteria.bobot);
     }
   }, [criteria]);
 
-  const handleSave = () => {
-    if (criteriaName.trim() && criteriaWeight > 0) {
-      onSave({
-        nama: criteriaName.trim(),
-        bobot: parseFloat(criteriaWeight),
-      });
+  const handleSave = async () => {
+    if (criteriaName && criteriaWeight > 0 && criteria) {
+      try {
+        setLoading(true);
+        const updatedCriteria = await updateCriteria(criteria.id, {
+          name: criteriaName.trim(),
+          weight: parseFloat(criteriaWeight),
+        });
+        onSave(updatedCriteria);
+        onClose();
+      } catch (error) {
+        console.error("Error updating criteria:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
     // Reset form when closing
-    setCriteriaName(criteria?.nama || "");
-    setCriteriaWeight(criteria?.bobot || 0);
+    setCriteriaName(criteria?.name || "");
+    setCriteriaWeight(criteria?.weight || 0);
     onClose();
   };
 
@@ -46,6 +58,7 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
               className="input input-bordered w-full"
               value={criteriaName}
               onChange={(e) => setCriteriaName(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -63,6 +76,7 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
               className="input input-bordered w-full"
               value={criteriaWeight}
               onChange={(e) => setCriteriaWeight(e.target.value)}
+              disabled={loading}
             />
             <label className="label">
               <span className="label-text-alt">Value between 0.0 - 1.0</span>
@@ -74,15 +88,16 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
             <button
               className="btn btn-ghost"
               onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               className="btn btn-primary"
               onClick={handleSave}
-              disabled={!criteriaName.trim() || criteriaWeight <= 0}
+              disabled={!criteriaName.trim() || criteriaWeight <= 0 || loading}
             >
-              Save
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
             </button>
           </div>
         </div>

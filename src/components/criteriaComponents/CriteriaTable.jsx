@@ -39,8 +39,8 @@ export default function CriteriaTable({ criterias, onEditCriteria }) {
                 {criterias.map((criteria, index) => (
                   <tr key={criteria.id}>
                     <td>{index + 1}</td>
-                    <td>{criteria.nama}</td>
-                    <td>{criteria.bobot}</td>
+                    <td>{criteria.name}</td>
+                    <td>{criteria.weight}</td>
                     <td>
                       <div className="flex gap-2">
                         <button

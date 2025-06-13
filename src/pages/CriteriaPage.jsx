@@ -1,18 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddCriteriaModal from "../components/criteriaComponents/AddCriteriaModal";
 import CriteriaTable from "../components/criteriaComponents/CriteriaTable";
+import { getAllCriteria } from "../services/criteriaService";
 
 export default function CriteriaPage() {
-  // Sample data for demonstration
-  const [criterias, setCriterias] = useState([
-    { id: 1, nama: "Harga", bobot: 0.25 },
-    { id: 2, nama: "RAM", bobot: 0.2 },
-    { id: 3, nama: "Storage", bobot: 0.15 },
-    { id: 4, nama: "Kamera", bobot: 0.2 },
-    { id: 5, nama: "Baterai", bobot: 0.2 },
-  ]);
-
+  const [criterias, setCriterias] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch criteria from API when component mounts
+  useEffect(() => {
+    const fetchCriteria = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllCriteria();
+        setCriterias(data);
+      } catch (err) {
+        setError("Failed to fetch criteria");
+        console.error("Error fetching criteria:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCriteria();
+  }, []);
 
   const handleAddCriteria = (newCriteria) => {
     const newId = Math.max(...criterias.map((c) => c.id)) + 1;
@@ -22,6 +35,26 @@ export default function CriteriaPage() {
   const handleEditCriteria = (id, updatedCriteria) => {
     setCriterias(criterias.map((criteria) => (criteria.id === id ? { ...criteria, ...updatedCriteria } : criteria)));
   };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex justify-center items-center h-64">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="alert alert-error">
+          <span>{error}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
