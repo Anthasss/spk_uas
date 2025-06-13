@@ -71,6 +71,7 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
                   <th>No.</th>
                   <th>Criteria Name</th>
                   <th>Weight</th>
+                  <th>Type</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -80,6 +81,11 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
                     <td>{index + 1}</td>
                     <td>{criteria.name}</td>
                     <td>{criteria.weight}</td>
+                    <td>
+                      <span className={`badge ${criteria.type === 'BENEFIT' ? 'badge-success' : 'badge-warning'}`}>
+                        {criteria.type || 'BENEFIT'}
+                      </span>
+                    </td>
                     <td>
                       <div className="flex gap-2">
                         <button

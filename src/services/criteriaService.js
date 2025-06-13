@@ -1,5 +1,5 @@
-import { apiClient } from '../api/apiClient';
-import { CRITERIA_ENDPOINTS } from '../api/criteriaEndpoints';
+import { apiClient } from "../api/apiClient";
+import { CRITERIA_ENDPOINTS } from "../api/criteriaEndpoints";
 
 // Create new criteria
 export const createCriteria = async (criteriaData) => {

@@ -4,6 +4,7 @@ import { createCriteria } from "../../services/criteriaService";
 export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
   const [criteriaName, setCriteriaName] = useState("");
   const [criteriaWeight, setCriteriaWeight] = useState(0);
+  const [criteriaType, setCriteriaType] = useState("BENEFIT");
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
@@ -13,11 +14,13 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
         const newCriteria = await createCriteria({
           name: criteriaName.trim(),
           weight: parseFloat(criteriaWeight),
+          type: criteriaType,
         });
         onSave(newCriteria);
         // Reset form
         setCriteriaName("");
         setCriteriaWeight(0);
+        setCriteriaType("BENEFIT");
         onClose();
       } catch (error) {
         console.error("Error creating criteria:", error);
@@ -32,6 +35,7 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
     // Reset form when closing
     setCriteriaName("");
     setCriteriaWeight(0);
+    setCriteriaType("BENEFIT");
     onClose();
   };
 
@@ -58,7 +62,7 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
           </div>
 
           {/* Criteria Weight Input */}
-          <div className="form-control w-full mb-6">
+          <div className="form-control w-full mb-4">
             <label className="label">
               <span className="label-text">Weight</span>
             </label>
@@ -75,6 +79,25 @@ export default function AddCriteriaModal({ isOpen, onClose, onSave }) {
             />
             <label className="label">
               <span className="label-text-alt">Value between 0.0 - 1.0</span>
+            </label>
+          </div>
+
+          {/* Criteria Type Select */}
+          <div className="form-control w-full mb-6">
+            <label className="label">
+              <span className="label-text">Type</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={criteriaType}
+              onChange={(e) => setCriteriaType(e.target.value)}
+              disabled={loading}
+            >
+              <option value="BENEFIT">BENEFIT</option>
+              <option value="COST">COST</option>
+            </select>
+            <label className="label">
+              <span className="label-text-alt">Choose BENEFIT for positive impact or COST for negative impact</span>
             </label>
           </div>
 

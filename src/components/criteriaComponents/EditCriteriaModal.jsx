@@ -4,6 +4,7 @@ import { updateCriteria } from "../../services/criteriaService";
 export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria }) {
   const [criteriaName, setCriteriaName] = useState("");
   const [criteriaWeight, setCriteriaWeight] = useState(0);
+  const [criteriaType, setCriteriaType] = useState("BENEFIT");
   const [loading, setLoading] = useState(false);
 
   // Set initial values when criteria prop changes
@@ -11,6 +12,7 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
     if (criteria) {
       setCriteriaName(criteria.name || criteria.nama);
       setCriteriaWeight(criteria.weight || criteria.bobot);
+      setCriteriaType(criteria.type || "BENEFIT");
     }
   }, [criteria]);
 
@@ -21,6 +23,7 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
         const updatedCriteria = await updateCriteria(criteria.id, {
           name: criteriaName.trim(),
           weight: parseFloat(criteriaWeight),
+          type: criteriaType,
         });
         onSave(updatedCriteria);
         onClose();
@@ -37,6 +40,7 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
     // Reset form when closing
     setCriteriaName(criteria?.name || "");
     setCriteriaWeight(criteria?.weight || 0);
+    setCriteriaType(criteria?.type || "BENEFIT");
     onClose();
   };
 
@@ -63,7 +67,7 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
           </div>
 
           {/* Criteria Weight Input */}
-          <div className="form-control w-full mb-6">
+          <div className="form-control w-full mb-4">
             <label className="label">
               <span className="label-text">Weight</span>
             </label>
@@ -80,6 +84,25 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
             />
             <label className="label">
               <span className="label-text-alt">Value between 0.0 - 1.0</span>
+            </label>
+          </div>
+
+          {/* Criteria Type Select */}
+          <div className="form-control w-full mb-6">
+            <label className="label">
+              <span className="label-text">Type</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={criteriaType}
+              onChange={(e) => setCriteriaType(e.target.value)}
+              disabled={loading}
+            >
+              <option value="BENEFIT">BENEFIT</option>
+              <option value="COST">COST</option>
+            </select>
+            <label className="label">
+              <span className="label-text-alt">Choose BENEFIT for positive impact or COST for negative impact</span>
             </label>
           </div>
 

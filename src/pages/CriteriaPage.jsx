@@ -22,7 +22,7 @@ export default function CriteriaPage() {
       } finally {
         setLoading(false);
       }
-    }; 
+    };
 
     fetchCriteria();
   }, []);
