@@ -1,32 +1,32 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function AddAlternativeModal({ isOpen, onClose, onSave }) {
-  const [alternativeName, setAlternativeName] = useState('');
+  const [alternativeName, setAlternativeName] = useState("");
 
   const handleSave = () => {
     if (alternativeName.trim()) {
       onSave({
-        nama: alternativeName.trim()
+        nama: alternativeName.trim(),
       });
       // Reset form
-      setAlternativeName('');
+      setAlternativeName("");
       onClose();
     }
   };
 
   const handleClose = () => {
     // Reset form when closing
-    setAlternativeName('');
+    setAlternativeName("");
     onClose();
   };
 
   return (
     <>
       {/* Modal */}
-      <div className={`modal ${isOpen ? 'modal-open' : ''}`}>
+      <div className={`modal ${isOpen ? "modal-open" : ""}`}>
         <div className="modal-box">
           <h3 className="font-bold text-lg mb-4">Add a new alternative</h3>
-          
+
           {/* Alternative Name Input */}
           <div className="form-control w-full mb-6">
             <label className="label">
@@ -43,11 +43,14 @@ export default function AddAlternativeModal({ isOpen, onClose, onSave }) {
 
           {/* Modal Actions */}
           <div className="modal-action">
-            <button className="btn btn-ghost" onClick={handleClose}>
+            <button
+              className="btn btn-ghost"
+              onClick={handleClose}
+            >
               Cancel
             </button>
-            <button 
-              className="btn btn-primary" 
+            <button
+              className="btn btn-primary"
               onClick={handleSave}
               disabled={!alternativeName.trim()}
             >
