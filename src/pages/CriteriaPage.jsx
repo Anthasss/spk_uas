@@ -22,18 +22,21 @@ export default function CriteriaPage() {
       } finally {
         setLoading(false);
       }
-    };
+    }; 
 
     fetchCriteria();
   }, []);
 
   const handleAddCriteria = (newCriteria) => {
-    const newId = Math.max(...criterias.map((c) => c.id)) + 1;
-    setCriterias([...criterias, { id: newId, ...newCriteria }]);
+    setCriterias([...criterias, newCriteria]);
   };
 
   const handleEditCriteria = (id, updatedCriteria) => {
     setCriterias(criterias.map((criteria) => (criteria.id === id ? { ...criteria, ...updatedCriteria } : criteria)));
+  };
+
+  const handleDeleteCriteria = (id) => {
+    setCriterias(criterias.filter((criteria) => criteria.id !== id));
   };
 
   if (loading) {
@@ -71,6 +74,7 @@ export default function CriteriaPage() {
       <CriteriaTable
         criterias={criterias}
         onEditCriteria={handleEditCriteria}
+        onDeleteCriteria={handleDeleteCriteria}
       />
 
       {/* Add Criteria Modal */}

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import EditCriteriaModal from "./EditCriteriaModal";
+import { deleteCriteria } from "../../services/criteriaService";
 
-export default function CriteriaTable({ criterias, onEditCriteria }) {
+export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCriteria }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCriteria, setSelectedCriteria] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleEditClick = (criteria) => {
     setSelectedCriteria(criteria);
@@ -19,6 +21,21 @@ export default function CriteriaTable({ criterias, onEditCriteria }) {
   const handleEditClose = () => {
     setIsEditModalOpen(false);
     setSelectedCriteria(null);
+  };
+
+  const handleDeleteClick = async (criteria) => {
+    if (window.confirm(`Are you sure you want to delete "${criteria.name}"?`)) {
+      try {
+        setDeletingId(criteria.id);
+        await deleteCriteria(criteria.id);
+        onDeleteCriteria(criteria.id);
+      } catch (error) {
+        console.error("Error deleting criteria:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setDeletingId(null);
+      }
+    }
   };
 
   return (
@@ -49,7 +66,17 @@ export default function CriteriaTable({ criterias, onEditCriteria }) {
                         >
                           Edit
                         </button>
-                        <button className="btn btn-sm btn-outline btn-error">Delete</button>
+                        <button 
+                          className="btn btn-sm btn-outline btn-error"
+                          onClick={() => handleDeleteClick(criteria)}
+                          disabled={deletingId === criteria.id}
+                        >
+                          {deletingId === criteria.id ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : (
+                            "Delete"
+                          )}
+                        </button>
                       </div>
                     </td>
                   </tr>

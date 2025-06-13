@@ -1,22 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddAlternativeModal from "../components/alternativeComponents/AddAlternativeModal";
 import AlternativeTable from "../components/alternativeComponents/AlternativeTable";
+import { getAllAlternatives } from "../services/alternativeService";
 
 export default function AlternativePage() {
-  // Sample data for demonstration
-  const [alternatives, setAlternatives] = useState([
-    { id: 1, nama: "Samsung Galaxy S24" },
-    { id: 2, nama: "iPhone 15 Pro" },
-    { id: 3, nama: "Xiaomi 14" }, 
-    { id: 4, nama: "OnePlus 12" },
-    { id: 5, nama: "Google Pixel 8" },
-  ]);
-
+  const [alternatives, setAlternatives] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch alternatives from API when component mounts
+  useEffect(() => {
+    const fetchAlternatives = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllAlternatives();
+        setAlternatives(data);
+      } catch (err) {
+        setError("Failed to fetch alternatives");
+        console.error("Error fetching alternatives:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAlternatives();
+  }, []);
 
   const handleAddAlternative = (newAlternative) => {
-    const newId = Math.max(...alternatives.map((a) => a.id)) + 1;
-    setAlternatives([...alternatives, { id: newId, ...newAlternative }]);
+    setAlternatives([...alternatives, newAlternative]);
   };
 
   const handleEditAlternative = (id, updatedAlternative) => {
@@ -26,6 +38,30 @@ export default function AlternativePage() {
       )
     );
   };
+
+  const handleDeleteAlternative = (id) => {
+    setAlternatives(alternatives.filter((alternative) => alternative.id !== id));
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex justify-center items-center h-64">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="alert alert-error">
+          <span>{error}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -42,6 +78,7 @@ export default function AlternativePage() {
       <AlternativeTable
         alternatives={alternatives}
         onEditAlternative={handleEditAlternative}
+        onDeleteAlternative={handleDeleteAlternative}
       />
 
       {/* Add Alternative Modal */}

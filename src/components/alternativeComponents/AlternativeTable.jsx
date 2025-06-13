@@ -1,9 +1,11 @@
 import { useState } from "react";
 import EditAlternativeModal from "./EditAlternativeModal";
+import { deleteAlternative } from "../../services/alternativeService";
 
-export default function AlternativeTable({ alternatives, onEditAlternative }) {
+export default function AlternativeTable({ alternatives, onEditAlternative, onDeleteAlternative }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAlternative, setSelectedAlternative] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleEditClick = (alternative) => {
     setSelectedAlternative(alternative);
@@ -19,6 +21,21 @@ export default function AlternativeTable({ alternatives, onEditAlternative }) {
   const handleEditClose = () => {
     setIsEditModalOpen(false);
     setSelectedAlternative(null);
+  };
+
+  const handleDeleteClick = async (alternative) => {
+    if (window.confirm(`Are you sure you want to delete "${alternative.name}"?`)) {
+      try {
+        setDeletingId(alternative.id);
+        await deleteAlternative(alternative.id);
+        onDeleteAlternative(alternative.id);
+      } catch (error) {
+        console.error("Error deleting alternative:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setDeletingId(null);
+      }
+    }
   };
 
   return (
@@ -38,7 +55,7 @@ export default function AlternativeTable({ alternatives, onEditAlternative }) {
                 {alternatives.map((alternative, index) => (
                   <tr key={alternative.id}>
                     <td>{index + 1}</td>
-                    <td>{alternative.nama}</td>
+                    <td>{alternative.nama || alternative.name}</td>
                     <td>
                       <div className="flex gap-2">
                         <button className="btn btn-sm btn-outline btn-success">Add Rating</button>
@@ -49,7 +66,17 @@ export default function AlternativeTable({ alternatives, onEditAlternative }) {
                         >
                           Edit
                         </button>
-                        <button className="btn btn-sm btn-outline btn-error">Delete</button>
+                        <button 
+                          className="btn btn-sm btn-outline btn-error"
+                          onClick={() => handleDeleteClick(alternative)}
+                          disabled={deletingId === alternative.id}
+                        >
+                          {deletingId === alternative.id ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : (
+                            "Delete"
+                          )}
+                        </button>
                       </div>
                     </td>
                   </tr>

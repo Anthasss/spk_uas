@@ -1,16 +1,27 @@
 import { useState } from "react";
+import { createAlternative } from "../../services/alternativeService";
 
 export default function AddAlternativeModal({ isOpen, onClose, onSave }) {
   const [alternativeName, setAlternativeName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (alternativeName.trim()) {
-      onSave({
-        nama: alternativeName.trim(),
-      });
-      // Reset form
-      setAlternativeName("");
-      onClose();
+      try {
+        setLoading(true);
+        const newAlternative = await createAlternative({
+          name: alternativeName.trim(),
+        });
+        onSave(newAlternative);
+        // Reset form
+        setAlternativeName("");
+        onClose();
+      } catch (error) {
+        console.error("Error creating alternative:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -38,6 +49,7 @@ export default function AddAlternativeModal({ isOpen, onClose, onSave }) {
               className="input input-bordered w-full"
               value={alternativeName}
               onChange={(e) => setAlternativeName(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -46,15 +58,16 @@ export default function AddAlternativeModal({ isOpen, onClose, onSave }) {
             <button
               className="btn btn-ghost"
               onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               className="btn btn-primary"
               onClick={handleSave}
-              disabled={!alternativeName.trim()}
+              disabled={!alternativeName.trim() || loading}
             >
-              Save
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
             </button>
           </div>
         </div>

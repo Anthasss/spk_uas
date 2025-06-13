@@ -1,26 +1,38 @@
 import { useState, useEffect } from "react";
+import { updateAlternative } from "../../services/alternativeService";
 
 export default function EditAlternativeModal({ isOpen, onClose, onSave, alternative }) {
   const [alternativeName, setAlternativeName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Set initial values when alternative prop changes
   useEffect(() => {
     if (alternative) {
-      setAlternativeName(alternative.nama);
+      setAlternativeName(alternative.name || alternative.name);
     }
   }, [alternative]);
 
-  const handleSave = () => {
-    if (alternativeName.trim()) {
-      onSave({
-        nama: alternativeName.trim(),
-      });
+  const handleSave = async () => {
+    if (alternativeName.trim() && alternative) {
+      try {
+        setLoading(true);
+        const updatedAlternative = await updateAlternative(alternative.id, {
+          name: alternativeName.trim(),
+        });
+        onSave(updatedAlternative);
+        onClose();
+      } catch (error) {
+        console.error("Error updating alternative:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
     // Reset form when closing
-    setAlternativeName(alternative?.nama || "");
+    setAlternativeName(alternative?.name || "");
     onClose();
   };
 
@@ -42,6 +54,7 @@ export default function EditAlternativeModal({ isOpen, onClose, onSave, alternat
               className="input input-bordered w-full"
               value={alternativeName}
               onChange={(e) => setAlternativeName(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -50,15 +63,16 @@ export default function EditAlternativeModal({ isOpen, onClose, onSave, alternat
             <button
               className="btn btn-ghost"
               onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               className="btn btn-primary"
               onClick={handleSave}
-              disabled={!alternativeName.trim()}
+              disabled={!alternativeName.trim() || loading}
             >
-              Save
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
             </button>
           </div>
         </div>
