@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EditCriteriaModal from "./EditCriteriaModal";
+import ConfirmationModal from "../common/ConfirmationModal";
 import { deleteCriteria } from "../../services/criteriaService";
 
 export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCriteria }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCriteria, setSelectedCriteria] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [criteriaToDelete, setCriteriaToDelete] = useState(null);
   const navigate = useNavigate();
 
   const handleEditClick = (criteria) => {
@@ -25,12 +28,19 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
     setSelectedCriteria(null);
   };
 
-  const handleDeleteClick = async (criteria) => {
-    if (window.confirm(`Are you sure you want to delete "${criteria.name}"?`)) {
+  const handleDeleteClick = (criteria) => {
+    setCriteriaToDelete(criteria);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (criteriaToDelete) {
       try {
-        setDeletingId(criteria.id);
-        await deleteCriteria(criteria.id);
-        onDeleteCriteria(criteria.id);
+        setDeletingId(criteriaToDelete.id);
+        await deleteCriteria(criteriaToDelete.id);
+        onDeleteCriteria(criteriaToDelete.id);
+        setIsDeleteModalOpen(false);
+        setCriteriaToDelete(null);
       } catch (error) {
         console.error("Error deleting criteria:", error);
         // You might want to show an error message to the user
@@ -38,6 +48,11 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
         setDeletingId(null);
       }
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setCriteriaToDelete(null);
   };
 
   const handleRatingsClick = (criteria) => {
@@ -109,6 +124,18 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
           criteria={selectedCriteria}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Criteria"
+        message={`Are you sure you want to delete "${criteriaToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={deletingId === criteriaToDelete?.id}
+      />
     </>
   );
 }

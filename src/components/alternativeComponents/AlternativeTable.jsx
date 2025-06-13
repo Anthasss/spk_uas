@@ -1,11 +1,14 @@
 import { useState } from "react";
 import EditAlternativeModal from "./EditAlternativeModal";
+import ConfirmationModal from "../common/ConfirmationModal";
 import { deleteAlternative } from "../../services/alternativeService";
 
 export default function AlternativeTable({ alternatives, onEditAlternative, onDeleteAlternative }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAlternative, setSelectedAlternative] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [alternativeToDelete, setAlternativeToDelete] = useState(null);
 
   const handleEditClick = (alternative) => {
     setSelectedAlternative(alternative);
@@ -23,12 +26,19 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
     setSelectedAlternative(null);
   };
 
-  const handleDeleteClick = async (alternative) => {
-    if (window.confirm(`Are you sure you want to delete "${alternative.name}"?`)) {
+  const handleDeleteClick = (alternative) => {
+    setAlternativeToDelete(alternative);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (alternativeToDelete) {
       try {
-        setDeletingId(alternative.id);
-        await deleteAlternative(alternative.id);
-        onDeleteAlternative(alternative.id);
+        setDeletingId(alternativeToDelete.id);
+        await deleteAlternative(alternativeToDelete.id);
+        onDeleteAlternative(alternativeToDelete.id);
+        setIsDeleteModalOpen(false);
+        setAlternativeToDelete(null);
       } catch (error) {
         console.error("Error deleting alternative:", error);
         // You might want to show an error message to the user
@@ -36,6 +46,11 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
         setDeletingId(null);
       }
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setAlternativeToDelete(null);
   };
 
   return (
@@ -96,6 +111,18 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
           alternative={selectedAlternative}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Alternative"
+        message={`Are you sure you want to delete "${alternativeToDelete?.nama || alternativeToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={deletingId === alternativeToDelete?.id}
+      />
     </>
   );
 }
