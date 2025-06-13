@@ -57,7 +57,7 @@ function App() {
               </label>
             </div>
             <div className="flex-1">
-              <span className="text-xl font-bold">My App</span>
+              <span className="text-xl font-bold">SMART Pemilihan Smartphone</span>
             </div>
           </div>
 

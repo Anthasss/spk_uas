@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { deleteSubCriteria } from "../../services/subCriteriaService";
 
@@ -6,6 +6,11 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [subCriteriaToDelete, setSubCriteriaToDelete] = useState(null);
+
+  // Sort subCriterias by ratingValue from largest to lowest
+  const sortedSubCriterias = useMemo(() => {
+    return [...subCriterias].sort((a, b) => b.ratingValue - a.ratingValue);
+  }, [subCriterias]);
 
   const handleEditClick = (subCriteria) => {
     // TODO: Implement edit functionality
@@ -54,7 +59,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
                 </tr>
               </thead>
               <tbody>
-                {subCriterias.length === 0 ? (
+                {sortedSubCriterias.length === 0 ? (
                   <tr>
                     <td
                       colSpan="4"
@@ -64,7 +69,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
                     </td>
                   </tr>
                 ) : (
-                  subCriterias.map((subCriteria, index) => (
+                  sortedSubCriterias.map((subCriteria, index) => (
                     <tr key={subCriteria.id}>
                       <td>{index + 1}</td>
                       <td>{subCriteria.realValue}</td>

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import EditAlternativeModal from "./EditAlternativeModal";
+import AddAlternativeRatingModal from "./alternativeRatingComponents/AddAlternativeRatingModal";
+import ViewAlternativeRatingModal from "./alternativeRatingComponents/ViewAlternativeRatingModal";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { deleteAlternative } from "../../services/alternativeService";
 
@@ -9,6 +11,10 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [alternativeToDelete, setAlternativeToDelete] = useState(null);
+  const [isAddRatingModalOpen, setIsAddRatingModalOpen] = useState(false);
+  const [alternativeForRating, setAlternativeForRating] = useState(null);
+  const [isViewRatingModalOpen, setIsViewRatingModalOpen] = useState(false);
+  const [alternativeForViewing, setAlternativeForViewing] = useState(null);
 
   const handleEditClick = (alternative) => {
     setSelectedAlternative(alternative);
@@ -53,6 +59,26 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
     setAlternativeToDelete(null);
   };
 
+  const handleAddRatingClick = (alternative) => {
+    setAlternativeForRating(alternative);
+    setIsAddRatingModalOpen(true);
+  };
+
+  const handleAddRatingClose = () => {
+    setIsAddRatingModalOpen(false);
+    setAlternativeForRating(null);
+  };
+
+  const handleViewRatingClick = (alternative) => {
+    setAlternativeForViewing(alternative);
+    setIsViewRatingModalOpen(true);
+  };
+
+  const handleViewRatingClose = () => {
+    setIsViewRatingModalOpen(false);
+    setAlternativeForViewing(null);
+  };
+
   return (
     <>
       <div className="card bg-base-100 shadow-xl">
@@ -73,15 +99,25 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
                     <td>{alternative.nama || alternative.name}</td>
                     <td>
                       <div className="flex gap-2">
-                        <button className="btn btn-sm btn-outline btn-success">Add Rating</button>
-                        <button className="btn btn-sm btn-outline btn-info">View Rating</button>
+                        <button
+                          className="btn btn-sm btn-outline btn-success"
+                          onClick={() => handleAddRatingClick(alternative)}
+                        >
+                          Add Rating
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline btn-info"
+                          onClick={() => handleViewRatingClick(alternative)}
+                        >
+                          View Rating
+                        </button>
                         <button
                           className="btn btn-sm btn-outline btn-primary"
                           onClick={() => handleEditClick(alternative)}
                         >
                           Edit
                         </button>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline btn-error"
                           onClick={() => handleDeleteClick(alternative)}
                           disabled={deletingId === alternative.id}
@@ -112,13 +148,33 @@ export default function AlternativeTable({ alternatives, onEditAlternative, onDe
         />
       )}
 
+      {/* Add Rating Modal */}
+      {alternativeForRating && (
+        <AddAlternativeRatingModal
+          isOpen={isAddRatingModalOpen}
+          onClose={handleAddRatingClose}
+          alternative={alternativeForRating}
+        />
+      )}
+
+      {/* View Rating Modal */}
+      {alternativeForViewing && (
+        <ViewAlternativeRatingModal
+          isOpen={isViewRatingModalOpen}
+          onClose={handleViewRatingClose}
+          alternative={alternativeForViewing}
+        />
+      )}
+
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="Delete Alternative"
-        message={`Are you sure you want to delete "${alternativeToDelete?.nama || alternativeToDelete?.name}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${
+          alternativeToDelete?.nama || alternativeToDelete?.name
+        }"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         isLoading={deletingId === alternativeToDelete?.id}
