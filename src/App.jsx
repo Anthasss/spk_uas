@@ -12,6 +12,8 @@ import Dashboard from "./components/Dashboard";
 import CriteriaPage from "./pages/CriteriaPage";
 import AlternativePage from "./pages/AlternativePage";
 import CalculationPage from "./pages/CalculationPage";
+import SubCriteriaPage from "./pages/SubCriteriaPage";
+
 
 function App() {
   const menuItems = [
@@ -77,6 +79,10 @@ function App() {
               <Route
                 path="/calculation"
                 element={<CalculationPage />}
+              />
+              <Route
+                path="/sub-criteria/:id"
+                element={<SubCriteriaPage />}
               />
             </Routes>
           </main>

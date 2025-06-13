@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import EditCriteriaModal from "./EditCriteriaModal";
 import { deleteCriteria } from "../../services/criteriaService";
 
@@ -6,6 +7,7 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCriteria, setSelectedCriteria] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const navigate = useNavigate();
 
   const handleEditClick = (criteria) => {
     setSelectedCriteria(criteria);
@@ -38,6 +40,11 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
     }
   };
 
+  const handleRatingsClick = (criteria) => {
+    // Navigate to sub-criteria page, optionally passing criteria ID as parameter
+    navigate(`/sub-criteria/${criteria.id}`);
+  };
+
   return (
     <>
       <div className="card bg-base-100 shadow-xl">
@@ -61,12 +68,18 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
                     <td>
                       <div className="flex gap-2">
                         <button
+                          className="btn btn-sm btn-outline btn-warning"
+                          onClick={() => handleRatingsClick(criteria)}
+                        >
+                          Ratings
+                        </button>
+                        <button
                           className="btn btn-sm btn-outline btn-primary"
                           onClick={() => handleEditClick(criteria)}
                         >
                           Edit
                         </button>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline btn-error"
                           onClick={() => handleDeleteClick(criteria)}
                           disabled={deletingId === criteria.id}
