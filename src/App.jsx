@@ -14,13 +14,12 @@ import AlternativePage from "./pages/AlternativePage";
 import CalculationPage from "./pages/CalculationPage";
 import SubCriteriaPage from "./pages/SubCriteriaPage";
 
-
 function App() {
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <House />, path: "/" },
+    { id: "calculation", label: "Calculation", icon: <Calculator />, path: "/" },
     { id: "criteria", label: "Criteria", icon: <Scale />, path: "/criteria" },
+    { id: "sub-criteria", label: "Sub Criteria", icon: <House />, path: "/sub-criteria" },
     { id: "alternative", label: "Alternative", icon: <UserRound />, path: "/alternative" },
-    { id: "calculation", label: "Calculation", icon: <Calculator />, path: "/calculation" },
   ];
 
   return (
@@ -66,7 +65,7 @@ function App() {
             <Routes>
               <Route
                 path="/"
-                element={<Dashboard />}
+                element={<CalculationPage />}
               />
               <Route
                 path="/criteria"
@@ -77,11 +76,7 @@ function App() {
                 element={<AlternativePage />}
               />
               <Route
-                path="/calculation"
-                element={<CalculationPage />}
-              />
-              <Route
-                path="/sub-criteria/:id"
+                path="/sub-criteria"
                 element={<SubCriteriaPage />}
               />
             </Routes>

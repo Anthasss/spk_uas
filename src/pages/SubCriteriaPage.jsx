@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getCriteriaById } from "../services/criteriaService";
+import { getCriteriaById, getAllCriteria } from "../services/criteriaService";
 import { getSubCriteriaByCriteriaId } from "../services/subCriteriaService";
 import SubCriteriaTable from "../components/subCriteriaComponents/SubCriteriaTable";
 import AddSubCriteriaModal from "../components/subCriteriaComponents/AddSubCriteriaModal";
@@ -8,20 +8,42 @@ import AddSubCriteriaModal from "../components/subCriteriaComponents/AddSubCrite
 export default function SubCriteria() {
   const { id } = useParams();
   const [criteria, setCriteria] = useState(null);
+  const [allCriteria, setAllCriteria] = useState([]);
+  const [selectedCriteriaId, setSelectedCriteriaId] = useState(id || "");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [subCriterias, setSubCriterias] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Fetch all criteria for dropdown
+  useEffect(() => {
+    const fetchAllCriteria = async () => {
+      try {
+        const criteriaData = await getAllCriteria();
+        setAllCriteria(criteriaData);
+      } catch (err) {
+        console.error("Error fetching all criteria:", err);
+      }
+    };
+
+    fetchAllCriteria();
+  }, []);
+
+  // Fetch data when selectedCriteriaId changes
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedCriteriaId) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
 
         // Fetch criteria and sub-criteria data in parallel
         const [criteriaData, subCriteriaData] = await Promise.all([
-          getCriteriaById(id),
-          getSubCriteriaByCriteriaId(id),
+          getCriteriaById(selectedCriteriaId),
+          getSubCriteriaByCriteriaId(selectedCriteriaId),
         ]);
 
         setCriteria(criteriaData);
@@ -34,36 +56,26 @@ export default function SubCriteria() {
       }
     };
 
-    if (id) {
-      fetchData();
-    }
-  }, [id]);
+    fetchData();
+  }, [selectedCriteriaId]);
+
+  const handleCriteriaChange = (e) => {
+    const newCriteriaId = e.target.value;
+    setSelectedCriteriaId(newCriteriaId);
+    setError(null); // Clear any previous errors
+  };
 
   const handleAddSubCriteria = (newSubCriteria) => {
     setSubCriterias((prev) => [...prev, newSubCriteria]);
   };
 
   const handleEditSubCriteria = (subCriteriaId, updatedData) => {
-    setSubCriterias((prev) =>
-      prev.map((item) =>
-        item.id === subCriteriaId ? { ...item, ...updatedData } : item
-      )
-    );
+    setSubCriterias((prev) => prev.map((item) => (item.id === subCriteriaId ? { ...item, ...updatedData } : item)));
   };
 
   const handleDeleteSubCriteria = (subCriteriaId) => {
     setSubCriterias((prev) => prev.filter((item) => item.id !== subCriteriaId));
   };
-
-  if (loading) {
-    return (
-      <div className="p-6">
-        <div className="flex justify-center items-center h-64">
-          <span className="loading loading-spinner loading-lg"></span>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -78,30 +90,73 @@ export default function SubCriteria() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">
-          Sub Criteria of {criteria?.name || "Loading..."}
-        </h1>
-        <button
-          className="btn btn-primary"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Add Sub Criteria
-        </button>
+        <h1 className="text-3xl font-bold">Sub Criteria Management</h1>
       </div>
 
-      <SubCriteriaTable
-        subCriterias={subCriterias}
-        onEditSubCriteria={handleEditSubCriteria}
-        onDeleteSubCriteria={handleDeleteSubCriteria}
-      />
+      {/* Criteria Selection Dropdown */}
+      <div className="flex justify-between items-center">
+        {/* dropdown menu */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Select Criteria:</label>
+          <select
+            className="select select-bordered w-full max-w-xs"
+            value={selectedCriteriaId}
+            onChange={handleCriteriaChange}
+          >
+            <option value="">Choose a criteria...</option>
+            {allCriteria.map((criteriaItem) => (
+              <option
+                key={criteriaItem.id}
+                value={criteriaItem.id}
+              >
+                {criteriaItem.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Add Sub Criteria Modal */}
-      <AddSubCriteriaModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleAddSubCriteria}
-        criteriaId={id}
-      />
+        {/* Button to add sub-criteria */}
+        {selectedCriteriaId && (
+          <button
+            className="btn btn-primary"
+            onClick={() => setIsModalOpen(true)}
+            disabled={loading}
+          >
+            Add Sub Criteria
+          </button>
+        )}
+      </div>
+
+      {selectedCriteriaId && (
+        <>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : (
+            <SubCriteriaTable
+              subCriterias={subCriterias}
+              onEditSubCriteria={handleEditSubCriteria}
+              onDeleteSubCriteria={handleDeleteSubCriteria}
+            />
+          )}
+
+          {/* Add Sub Criteria Modal */}
+          <AddSubCriteriaModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleAddSubCriteria}
+            criteriaId={selectedCriteriaId}
+          />
+        </>
+      )}
+
+      {/* Show message when no criteria is selected */}
+      {!selectedCriteriaId && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">Please select a criteria to view its sub-criteria.</p>
+        </div>
+      )}
     </div>
   );
 }
