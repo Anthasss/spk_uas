@@ -2,13 +2,12 @@ import "./App.css";
 
 // Importing Libraries
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { House, Scale, UserRound, Calculator } from "lucide-react";
+import { Scale, Star, UserRound, Calculator } from "lucide-react";
 
 // Importing components
 import Sidebar from "./components/Sidebar";
 
 // Importing pages
-import Dashboard from "./components/Dashboard";
 import CriteriaPage from "./pages/CriteriaPage";
 import AlternativePage from "./pages/AlternativePage";
 import CalculationPage from "./pages/CalculationPage";
@@ -18,7 +17,7 @@ function App() {
   const menuItems = [
     { id: "calculation", label: "Calculation", icon: <Calculator />, path: "/" },
     { id: "criteria", label: "Criteria", icon: <Scale />, path: "/criteria" },
-    { id: "sub-criteria", label: "Sub Criteria", icon: <House />, path: "/sub-criteria" },
+    { id: "sub-criteria", label: "Sub Criteria", icon: <Star />, path: "/sub-criteria" },
     { id: "alternative", label: "Alternative", icon: <UserRound />, path: "/alternative" },
   ];
 
