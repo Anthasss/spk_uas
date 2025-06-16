@@ -4,6 +4,8 @@ import { getAllCriteria } from "../services/criteriaService";
 import { getAllAlternativeRatings } from "../services/alternativeRatingService";
 import AlternativeRatingTable from "../components/calculationComponents/AlternativeRatingTable";
 import UtilityTable from "../components/calculationComponents/UtilityTable";
+import PreferenceTable from "../components/calculationComponents/PreferenceTable";
+import RankingTable from "../components/calculationComponents/RankingTable";
 
 export default function CalculationPage() {
   const [loading, setLoading] = useState(true);
@@ -100,6 +102,18 @@ export default function CalculationPage() {
         />
 
         <UtilityTable
+          alternatives={alternatives}
+          criteria={criteria}
+          ratings={ratings}
+        />
+
+        <PreferenceTable
+          alternatives={alternatives}
+          criteria={criteria}
+          ratings={ratings}
+        />
+
+        <RankingTable
           alternatives={alternatives}
           criteria={criteria}
           ratings={ratings}
