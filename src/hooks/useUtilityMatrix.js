@@ -66,6 +66,7 @@ export function useUtilityMatrix(alternatives, criteria, ratings) {
 
   useEffect(() => {
     calculateUtilityMatrix();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alternatives, criteria, ratings]);
 
   return utilityMatrix;
