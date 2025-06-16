@@ -71,12 +71,6 @@ export default function CalculationPage() {
         </div>
         <div className="alert alert-error">
           <span>{error}</span>
-          <button
-            className="btn btn-sm btn-outline"
-            onClick={fetchData}
-          >
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -86,12 +80,6 @@ export default function CalculationPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">SMART Calculation</h1>
-        <button
-          className="btn btn-primary"
-          onClick={fetchData}
-        >
-          Refresh Data
-        </button>
       </div>
 
       <div className="space-y-6">

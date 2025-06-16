@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 export default function AlternativeRatingTable({ alternatives, criteria, ratings }) {
   const [ratingMatrix, setRatingMatrix] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     if (alternatives && criteria && ratings) {
@@ -9,6 +11,11 @@ export default function AlternativeRatingTable({ alternatives, criteria, ratings
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alternatives, criteria, ratings]);
+
+  // Reset to first page when alternatives change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [alternatives]);
 
   const createRatingMatrix = () => {
     // Create rating matrix: {alternativeId: {criteriaId: ratingValue}}
@@ -35,6 +42,16 @@ export default function AlternativeRatingTable({ alternatives, criteria, ratings
     return rating || { ratingValue: 0, realValue: "N/A" };
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(alternatives.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentAlternatives = alternatives.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   // Show loading state if props are not yet available
   if (!alternatives || !criteria || !ratings) {
     return (
@@ -54,6 +71,9 @@ export default function AlternativeRatingTable({ alternatives, criteria, ratings
       <div className="card-body">
         <div className="flex justify-between items-center mb-4">
           <h2 className="card-title">Alternative Rating Matrix</h2>
+          <div className="text-sm text-gray-500">
+            Showing {startIndex + 1}-{Math.min(endIndex, alternatives.length)} of {alternatives.length} alternatives
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -85,7 +105,7 @@ export default function AlternativeRatingTable({ alternatives, criteria, ratings
                   </td>
                 </tr>
               ) : (
-                alternatives.map((alternative) => (
+                currentAlternatives.map((alternative) => (
                   <tr key={alternative.id}>
                     <td className="sticky left-0 bg-base-200 z-10 font-semibold">
                       {alternative.nama || alternative.name}
@@ -112,6 +132,37 @@ export default function AlternativeRatingTable({ alternatives, criteria, ratings
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-4">
+            <div className="join">
+              <button 
+                className="join-item btn btn-sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                «
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  className={`join-item btn btn-sm ${currentPage === page ? 'btn-active' : ''}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              ))}
+              <button 
+                className="join-item btn btn-sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                »
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
