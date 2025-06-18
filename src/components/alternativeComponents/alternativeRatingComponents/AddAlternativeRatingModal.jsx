@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { getAllCriteria } from "../../../services/criteriaService";
 import { getSubCriteriaByCriteriaId } from "../../../services/subCriteriaService";
-import { createAlternativeRating } from "../../../services/alternativeRatingService";
+import {
+  createAlternativeRating,
+  getAlternativeRatingsByAlternativeId,
+  updateAlternativeRating,
+} from "../../../services/alternativeRatingService";
 
 export default function AddAlternativeRatingModal({ isOpen, onClose, alternative }) {
   const [loading, setLoading] = useState(false);
@@ -82,23 +86,36 @@ export default function AddAlternativeRatingModal({ isOpen, onClose, alternative
         return;
       }
 
-      // Create rating data for each criteria-subcriteria pair
+      // Get all existing ratings for this alternative
+      const existingRatings = await getAlternativeRatingsByAlternativeId(alternative.id);
+
+      // Map existing ratings by criteriaId for quick lookup
+      const existingRatingsMap = {};
+      existingRatings.forEach((rating) => {
+        existingRatingsMap[rating.criteriaId] = rating;
+      });
+
+      // For each criteria, update if exists, otherwise create new
       const ratingPromises = Object.entries(selectedRatings).map(async ([criteriaId, subCriteriaId]) => {
+        const existing = existingRatingsMap[parseInt(criteriaId)];
         const ratingData = {
           criteriaId: parseInt(criteriaId),
           subCriteriaId: parseInt(subCriteriaId),
           alternativeId: alternative.id,
         };
 
-        return await createAlternativeRating(ratingData);
+        if (existing) {
+          // Update existing rating
+          return await updateAlternativeRating(existing.id, ratingData);
+        } else {
+          // Create new rating
+          return await createAlternativeRating(ratingData);
+        }
       });
 
-      // Save all ratings
       await Promise.all(ratingPromises);
 
-      console.log("Successfully saved all ratings for alternative:", alternative);
       alert("Ratings saved successfully!");
-
       onClose();
     } catch (error) {
       console.error("Error saving rating:", error);

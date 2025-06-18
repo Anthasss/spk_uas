@@ -16,6 +16,7 @@ export default function AlternativePage() {
         setLoading(true);
         const data = await getAllAlternatives();
         setAlternatives(data);
+        console.log("alternatives:", data);
       } catch (err) {
         setError("Failed to fetch alternatives");
         console.error("Error fetching alternatives:", err);
