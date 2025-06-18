@@ -1,48 +1,54 @@
-import { useState, useMemo } from "react";
-import ConfirmationModal from "../common/ConfirmationModal";
-import { deleteSubCriteria } from "../../services/subCriteriaService";
+import {
+  // useState,
+  useMemo,
+} from "react";
+// import ConfirmationModal from "../common/ConfirmationModal";
+// import { deleteSubCriteria } from "../../services/subCriteriaService";
 
-export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) {
-  const [deletingId, setDeletingId] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [subCriteriaToDelete, setSubCriteriaToDelete] = useState(null);
+export default function SubCriteriaTable({
+  subCriterias,
+  // onDeleteSubCriteria
+}) {
+  // const [deletingId, setDeletingId] = useState(null);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // const [subCriteriaToDelete, setSubCriteriaToDelete] = useState(null);
 
   // Sort subCriterias by ratingValue from largest to lowest
   const sortedSubCriterias = useMemo(() => {
     return [...subCriterias].sort((a, b) => b.ratingValue - a.ratingValue);
   }, [subCriterias]);
 
-  const handleEditClick = (subCriteria) => {
-    // TODO: Implement edit functionality
-    console.log("Edit sub-criteria:", subCriteria);
-  };
+  // const handleEditClick = (subCriteria) => {
+  //   // TODO: Implement edit functionality
+  //   console.log("Edit sub-criteria:", subCriteria);
+  // };
 
-  const handleDeleteClick = (subCriteria) => {
-    setSubCriteriaToDelete(subCriteria);
-    setIsDeleteModalOpen(true);
-  };
+  // const handleDeleteClick = (subCriteria) => {
+  //   setSubCriteriaToDelete(subCriteria);
+  //   setIsDeleteModalOpen(true);
+  // };
 
-  const handleDeleteConfirm = async () => {
-    if (subCriteriaToDelete) {
-      try {
-        setDeletingId(subCriteriaToDelete.id);
-        await deleteSubCriteria(subCriteriaToDelete.id);
-        onDeleteSubCriteria(subCriteriaToDelete.id);
-        setIsDeleteModalOpen(false);
-        setSubCriteriaToDelete(null);
-      } catch (error) {
-        console.error("Error deleting sub-criteria:", error);
-        // You might want to show an error message to the user
-      } finally {
-        setDeletingId(null);
-      }
-    }
-  };
+  // const handleDeleteConfirm = async () => {
+  //   if (subCriteriaToDelete) {
+  //     try {
+  //       setDeletingId(subCriteriaToDelete.id);
+  //       await deleteSubCriteria(subCriteriaToDelete.id);
+  //       onDeleteSubCriteria(subCriteriaToDelete.id);
+  //       setIsDeleteModalOpen(false);
+  //       setSubCriteriaToDelete(null);
+  //     } catch (error) {
+  //       console.error("Error deleting sub-criteria:", error);
+  //       // You might want to show an error message to the user
+  //     } finally {
+  //       setDeletingId(null);
+  //     }
+  //   }
+  // };
 
-  const handleDeleteCancel = () => {
-    setIsDeleteModalOpen(false);
-    setSubCriteriaToDelete(null);
-  };
+  // const handleDeleteCancel = () => {
+  //   setIsDeleteModalOpen(false);
+  //   setSubCriteriaToDelete(null);
+  // };
 
   return (
     <>
@@ -55,7 +61,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
                   <th>No.</th>
                   <th>Real Value</th>
                   <th>Rating</th>
-                  <th>Action</th>
+                  {/* <th>Action</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -74,7 +80,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
                       <td>{index + 1}</td>
                       <td>{subCriteria.realValue}</td>
                       <td>{subCriteria.ratingValue}</td>
-                      <td>
+                      {/* <td>
                         <div className="flex gap-2">
                           <button
                             className="btn btn-sm btn-outline btn-primary"
@@ -94,7 +100,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
                             )}
                           </button>
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 )}
@@ -105,7 +111,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
       </div>
 
       {/* Delete Confirmation Modal */}
-      <ConfirmationModal
+      {/* <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
@@ -114,7 +120,7 @@ export default function SubCriteriaTable({ subCriterias, onDeleteSubCriteria }) 
         confirmText="Delete"
         cancelText="Cancel"
         isLoading={deletingId === subCriteriaToDelete?.id}
-      />
+      /> */}
     </>
   );
 }

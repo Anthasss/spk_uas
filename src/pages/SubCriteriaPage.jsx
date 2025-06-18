@@ -1,19 +1,22 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getCriteriaById, getAllCriteria } from "../services/criteriaService";
+import {
+  // getCriteriaById,
+  getAllCriteria,
+} from "../services/criteriaService";
 import { getSubCriteriaByCriteriaId } from "../services/subCriteriaService";
 import SubCriteriaTable from "../components/subCriteriaComponents/SubCriteriaTable";
 import AddSubCriteriaModal from "../components/subCriteriaComponents/AddSubCriteriaModal";
 
 export default function SubCriteria() {
   const { id } = useParams();
-  const [criteria, setCriteria] = useState(null);
+  // const [criteria, setCriteria] = useState(null);
   const [allCriteria, setAllCriteria] = useState([]);
   const [selectedCriteriaId, setSelectedCriteriaId] = useState(id || "");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [subCriterias, setSubCriterias] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch all criteria for dropdown
   useEffect(() => {
@@ -21,12 +24,19 @@ export default function SubCriteria() {
       try {
         const criteriaData = await getAllCriteria();
         setAllCriteria(criteriaData);
+
+        // Automatically select the first criteria if none is selected
+        if (!selectedCriteriaId && criteriaData.length > 0) {
+          setSelectedCriteriaId(criteriaData[0].id);
+        }
       } catch (err) {
         console.error("Error fetching all criteria:", err);
       }
     };
 
     fetchAllCriteria();
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch data when selectedCriteriaId changes
@@ -41,12 +51,12 @@ export default function SubCriteria() {
         setLoading(true);
 
         // Fetch criteria and sub-criteria data in parallel
-        const [criteriaData, subCriteriaData] = await Promise.all([
-          getCriteriaById(selectedCriteriaId),
+        const [subCriteriaData] = await Promise.all([
+          // getCriteriaById(selectedCriteriaId),
           getSubCriteriaByCriteriaId(selectedCriteriaId),
         ]);
 
-        setCriteria(criteriaData);
+        // setCriteria(criteriaData);
         setSubCriterias(subCriteriaData);
       } catch (err) {
         setError(err.message);
@@ -65,17 +75,17 @@ export default function SubCriteria() {
     setError(null); // Clear any previous errors
   };
 
-  const handleAddSubCriteria = (newSubCriteria) => {
-    setSubCriterias((prev) => [...prev, newSubCriteria]);
-  };
+  // const handleAddSubCriteria = (newSubCriteria) => {
+  //   setSubCriterias((prev) => [...prev, newSubCriteria]);
+  // };
 
-  const handleEditSubCriteria = (subCriteriaId, updatedData) => {
-    setSubCriterias((prev) => prev.map((item) => (item.id === subCriteriaId ? { ...item, ...updatedData } : item)));
-  };
+  // const handleEditSubCriteria = (subCriteriaId, updatedData) => {
+  //   setSubCriterias((prev) => prev.map((item) => (item.id === subCriteriaId ? { ...item, ...updatedData } : item)));
+  // };
 
-  const handleDeleteSubCriteria = (subCriteriaId) => {
-    setSubCriterias((prev) => prev.filter((item) => item.id !== subCriteriaId));
-  };
+  // const handleDeleteSubCriteria = (subCriteriaId) => {
+  //   setSubCriterias((prev) => prev.filter((item) => item.id !== subCriteriaId));
+  // };
 
   if (error) {
     return (
@@ -103,7 +113,6 @@ export default function SubCriteria() {
             value={selectedCriteriaId}
             onChange={handleCriteriaChange}
           >
-            <option value="">Choose a criteria...</option>
             {allCriteria.map((criteriaItem) => (
               <option
                 key={criteriaItem.id}
@@ -116,7 +125,7 @@ export default function SubCriteria() {
         </div>
 
         {/* Button to add sub-criteria */}
-        {selectedCriteriaId && (
+        {/* {selectedCriteriaId && (
           <button
             className="btn btn-primary"
             onClick={() => setIsModalOpen(true)}
@@ -124,7 +133,7 @@ export default function SubCriteria() {
           >
             Add Sub Criteria
           </button>
-        )}
+        )} */}
       </div>
 
       {selectedCriteriaId && (
@@ -136,25 +145,25 @@ export default function SubCriteria() {
           ) : (
             <SubCriteriaTable
               subCriterias={subCriterias}
-              onEditSubCriteria={handleEditSubCriteria}
-              onDeleteSubCriteria={handleDeleteSubCriteria}
+              // onEditSubCriteria={handleEditSubCriteria}
+              // onDeleteSubCriteria={handleDeleteSubCriteria}
             />
           )}
 
           {/* Add Sub Criteria Modal */}
-          <AddSubCriteriaModal
+          {/* <AddSubCriteriaModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onSave={handleAddSubCriteria}
             criteriaId={selectedCriteriaId}
-          />
+          /> */}
         </>
       )}
 
       {/* Show message when no criteria is selected */}
       {!selectedCriteriaId && (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">Please select a criteria to view its sub-criteria.</p>
+          <span className="loading loading-spinner loading-lg"></span>
         </div>
       )}
     </div>
