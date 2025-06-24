@@ -4,7 +4,7 @@ import EditCriteriaModal from "./EditCriteriaModal";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { deleteCriteria } from "../../services/criteriaService";
 
-export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCriteria }) {
+export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCriteria, totalWeight }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCriteria, setSelectedCriteria] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -128,6 +128,7 @@ export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCrite
           onClose={handleEditClose}
           onSave={handleEditSave}
           criteria={selectedCriteria}
+          totalWeight={totalWeight}
         />
       )}
 

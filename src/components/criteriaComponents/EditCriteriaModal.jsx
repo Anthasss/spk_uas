@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { updateCriteria } from "../../services/criteriaService";
 
-export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria }) {
+export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria, totalWeight }) {
   const [criteriaName, setCriteriaName] = useState("");
   const [criteriaWeight, setCriteriaWeight] = useState(0);
   const [criteriaType, setCriteriaType] = useState("BENEFIT");
@@ -16,8 +16,24 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
     }
   }, [criteria]);
 
+  // Calculate if total weight exceeds 1 directly (excluding current criteria being edited)
+  const totalWeightExcludingCurrent = criteria ? totalWeight - (criteria.weight || criteria.bobot) : totalWeight;
+
+  const exceedsTotalWeight = totalWeightExcludingCurrent + criteriaWeight > 1;
+
+  const handleWeightChange = (value) => {
+    const parsedValue = parseFloat(value);
+    if (!isNaN(parsedValue)) {
+      setCriteriaWeight(parsedValue);
+      console.log("new total weight =", criteriaWeight + totalWeightExcludingCurrent);
+      console.log("exceeds total weight =", exceedsTotalWeight);
+    } else {
+      setCriteriaWeight(0); // Reset to 0 if input is invalid
+    }
+  };
+
   const handleSave = async () => {
-    if (criteriaName && criteriaWeight > 0 && criteria) {
+    if (criteriaName.trim() && criteriaWeight > 0 && criteriaWeight <= 1 && !exceedsTotalWeight) {
       try {
         setLoading(true);
         const updatedCriteria = await updateCriteria(criteria.id, {
@@ -79,13 +95,18 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
               max="1"
               className="input input-bordered w-full"
               value={criteriaWeight}
-              onChange={(e) => setCriteriaWeight(e.target.value)}
+              onChange={(e) => handleWeightChange(e.target.value)}
               disabled={loading}
             />
             <label className="label">
               <span className="label-text-alt">Value between 0.0 - 1.0</span>
             </label>
           </div>
+
+          {/* Warning if total weight exceeds 1 */}
+          {exceedsTotalWeight && (
+            <div className="text-red-500 text-sm mb-4">Total bobot tidak boleh melebihi 1. Kurangi bobot kriteria.</div>
+          )}
 
           {/* Criteria Type Select */}
           <div className="form-control w-full mb-6">
@@ -118,7 +139,9 @@ export default function EditCriteriaModal({ isOpen, onClose, onSave, criteria })
             <button
               className="btn btn-primary"
               onClick={handleSave}
-              disabled={!criteriaName.trim() || criteriaWeight <= 0 || loading}
+              disabled={
+                !criteriaName.trim() || criteriaWeight <= 0 || criteriaWeight > 1 || exceedsTotalWeight || loading
+              }
             >
               {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
             </button>

@@ -9,6 +9,9 @@ export default function CriteriaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Calculate total weight
+  const totalWeight = criterias.reduce((sum, criteria) => sum + criteria.weight, 0);
+
   // Fetch criteria from API when component mounts
   useEffect(() => {
     const fetchCriteria = async () => {
@@ -63,18 +66,23 @@ export default function CriteriaPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Kriteria</h1>
-        <button
-          className="btn btn-primary"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Tambah Kriteria
-        </button>
+        <div className="flex items-center gap-4">
+          <span className="text-lg font-medium">Total Bobot: {totalWeight.toFixed(2)}</span>
+          <button
+            className="btn btn-primary"
+            onClick={() => setIsModalOpen(true)}
+            disabled={totalWeight >= 1}
+          >
+            Tambah Kriteria
+          </button>
+        </div>
       </div>
 
       <CriteriaTable
         criterias={criterias}
         onEditCriteria={handleEditCriteria}
         onDeleteCriteria={handleDeleteCriteria}
+        totalWeight={totalWeight}
       />
 
       {/* Add Criteria Modal */}
@@ -82,6 +90,7 @@ export default function CriteriaPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleAddCriteria}
+        totalWeight={totalWeight}
       />
     </div>
   );
