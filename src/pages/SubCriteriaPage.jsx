@@ -1,22 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import {
-  // getCriteriaById,
-  getAllCriteria,
-} from "../services/criteriaService";
-import { getSubCriteriaByCriteriaId } from "../services/subCriteriaService";
+import { getAllCriteria } from "../services/criteriaService";
 import SubCriteriaTable from "../components/subCriteriaComponents/SubCriteriaTable";
 import AddSubCriteriaModal from "../components/subCriteriaComponents/AddSubCriteriaModal";
 
 export default function SubCriteria() {
   const { id } = useParams();
-  // const [criteria, setCriteria] = useState(null);
   const [allCriteria, setAllCriteria] = useState([]);
   const [selectedCriteriaId, setSelectedCriteriaId] = useState(id || "");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [subCriterias, setSubCriterias] = useState([]);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch all criteria for dropdown
   useEffect(() => {
@@ -24,6 +18,7 @@ export default function SubCriteria() {
       try {
         const criteriaData = await getAllCriteria();
         setAllCriteria(criteriaData);
+        console.log("All criteria:", criteriaData);
 
         // Automatically select the first criteria if none is selected
         if (!selectedCriteriaId && criteriaData.length > 0) {
@@ -31,43 +26,18 @@ export default function SubCriteria() {
         }
       } catch (err) {
         console.error("Error fetching all criteria:", err);
-      }
-    };
-
-    fetchAllCriteria();
-    // Only run on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Fetch data when selectedCriteriaId changes
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!selectedCriteriaId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        // Fetch criteria and sub-criteria data in parallel
-        const [subCriteriaData] = await Promise.all([
-          // getCriteriaById(selectedCriteriaId),
-          getSubCriteriaByCriteriaId(selectedCriteriaId),
-        ]);
-
-        // setCriteria(criteriaData);
-        setSubCriterias(subCriteriaData);
-      } catch (err) {
-        setError(err.message);
-        console.error("Error fetching data:", err);
+        setError("Failed to fetch criteria.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [selectedCriteriaId]);
+    fetchAllCriteria();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Get sub-criteria for the selected criteria
+  const selectedCriteria = allCriteria.find((criteria) => criteria.id === parseInt(selectedCriteriaId));
 
   const handleCriteriaChange = (e) => {
     const newCriteriaId = e.target.value;
@@ -75,17 +45,34 @@ export default function SubCriteria() {
     setError(null); // Clear any previous errors
   };
 
-  // const handleAddSubCriteria = (newSubCriteria) => {
-  //   setSubCriterias((prev) => [...prev, newSubCriteria]);
-  // };
+  const handleAddSubCriteria = (newSubCriteria) => {
+    if (selectedCriteria) {
+      selectedCriteria.subCriteria = [...selectedCriteria.subCriteria, newSubCriteria];
+    }
+  };
 
-  // const handleEditSubCriteria = (subCriteriaId, updatedData) => {
-  //   setSubCriterias((prev) => prev.map((item) => (item.id === subCriteriaId ? { ...item, ...updatedData } : item)));
-  // };
+  const handleEditSubCriteria = (subCriteriaId, updatedData) => {
+    if (selectedCriteria) {
+      selectedCriteria.subCriteria = selectedCriteria.subCriteria.map((item) =>
+        item.id === subCriteriaId ? { ...item, ...updatedData } : item
+      );
+    }
+  };
 
-  // const handleDeleteSubCriteria = (subCriteriaId) => {
-  //   setSubCriterias((prev) => prev.filter((item) => item.id !== subCriteriaId));
-  // };
+  const handleDeleteSubCriteria = (subCriteriaId) => {
+    if (selectedCriteria) {
+      // Update the subCriteria array for the selected criteria
+      const updatedSubCriteria = selectedCriteria.subCriteria.filter((item) => item.id !== subCriteriaId);
+
+      // Update the selectedCriteria object
+      const updatedCriteria = { ...selectedCriteria, subCriteria: updatedSubCriteria };
+
+      // Update the allCriteria state with the modified criteria
+      setAllCriteria((prevCriteria) =>
+        prevCriteria.map((criteria) => (criteria.id === selectedCriteria.id ? updatedCriteria : criteria))
+      );
+    }
+  };
 
   if (error) {
     return (
@@ -105,7 +92,6 @@ export default function SubCriteria() {
 
       {/* Criteria Selection Dropdown */}
       <div className="flex justify-between items-center">
-        {/* dropdown menu */}
         <div>
           <label className="block text-sm font-medium mb-2">Select Criteria:</label>
           <select
@@ -124,8 +110,7 @@ export default function SubCriteria() {
           </select>
         </div>
 
-        {/* Button to add sub-criteria */}
-        {/* {selectedCriteriaId && (
+        {selectedCriteriaId && (
           <button
             className="btn btn-primary"
             onClick={() => setIsModalOpen(true)}
@@ -133,10 +118,10 @@ export default function SubCriteria() {
           >
             Add Sub Criteria
           </button>
-        )} */}
+        )}
       </div>
 
-      {selectedCriteriaId && (
+      {selectedCriteriaId && selectedCriteria && (
         <>
           {loading ? (
             <div className="flex justify-center items-center h-64">
@@ -144,23 +129,21 @@ export default function SubCriteria() {
             </div>
           ) : (
             <SubCriteriaTable
-              subCriterias={subCriterias}
-              // onEditSubCriteria={handleEditSubCriteria}
-              // onDeleteSubCriteria={handleDeleteSubCriteria}
+              subCriterias={selectedCriteria.subCriteria}
+              onEditSubCriteria={handleEditSubCriteria}
+              onDeleteSubCriteria={handleDeleteSubCriteria}
             />
           )}
 
-          {/* Add Sub Criteria Modal */}
-          {/* <AddSubCriteriaModal
+          <AddSubCriteriaModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onSave={handleAddSubCriteria}
             criteriaId={selectedCriteriaId}
-          /> */}
+          />
         </>
       )}
 
-      {/* Show message when no criteria is selected */}
       {!selectedCriteriaId && (
         <div className="text-center py-12">
           <span className="loading loading-spinner loading-lg"></span>

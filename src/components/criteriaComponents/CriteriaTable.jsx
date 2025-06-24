@@ -1,63 +1,59 @@
-// import { useState } from "react";
+import { useState } from "react";
 // import { useNavigate } from "react-router-dom";
-// import EditCriteriaModal from "./EditCriteriaModal";
-// import ConfirmationModal from "../common/ConfirmationModal";
-// import { deleteCriteria } from "../../services/criteriaService";
+import EditCriteriaModal from "./EditCriteriaModal";
+import ConfirmationModal from "../common/ConfirmationModal";
+import { deleteCriteria } from "../../services/criteriaService";
 
-export default function CriteriaTable({
-  criterias,
-  // onEditCriteria,
-  // onDeleteCriteria
-}) {
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [selectedCriteria, setSelectedCriteria] = useState(null);
-  // const [deletingId, setDeletingId] = useState(null);
-  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  // const [criteriaToDelete, setCriteriaToDelete] = useState(null);
+export default function CriteriaTable({ criterias, onEditCriteria, onDeleteCriteria }) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCriteria, setSelectedCriteria] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [criteriaToDelete, setCriteriaToDelete] = useState(null);
   // const navigate = useNavigate();
 
-  // const handleEditClick = (criteria) => {
-  //   setSelectedCriteria(criteria);
-  //   setIsEditModalOpen(true);
-  // };
+  const handleEditClick = (criteria) => {
+    setSelectedCriteria(criteria);
+    setIsEditModalOpen(true);
+  };
 
-  // const handleEditSave = (updatedCriteria) => {
-  //   onEditCriteria(selectedCriteria.id, updatedCriteria);
-  //   setIsEditModalOpen(false);
-  //   setSelectedCriteria(null);
-  // };
+  const handleEditSave = (updatedCriteria) => {
+    onEditCriteria(selectedCriteria.id, updatedCriteria);
+    setIsEditModalOpen(false);
+    setSelectedCriteria(null);
+  };
 
-  // const handleEditClose = () => {
-  //   setIsEditModalOpen(false);
-  //   setSelectedCriteria(null);
-  // };
+  const handleEditClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedCriteria(null);
+  };
 
-  // const handleDeleteClick = (criteria) => {
-  //   setCriteriaToDelete(criteria);
-  //   setIsDeleteModalOpen(true);
-  // };
+  const handleDeleteClick = (criteria) => {
+    setCriteriaToDelete(criteria);
+    setIsDeleteModalOpen(true);
+  };
 
-  // const handleDeleteConfirm = async () => {
-  //   if (criteriaToDelete) {
-  //     try {
-  //       setDeletingId(criteriaToDelete.id);
-  //       await deleteCriteria(criteriaToDelete.id);
-  //       onDeleteCriteria(criteriaToDelete.id);
-  //       setIsDeleteModalOpen(false);
-  //       setCriteriaToDelete(null);
-  //     } catch (error) {
-  //       console.error("Error deleting criteria:", error);
-  //       // You might want to show an error message to the user
-  //     } finally {
-  //       setDeletingId(null);
-  //     }
-  //   }
-  // };
+  const handleDeleteConfirm = async () => {
+    if (criteriaToDelete) {
+      try {
+        setDeletingId(criteriaToDelete.id);
+        await deleteCriteria(criteriaToDelete.id);
+        onDeleteCriteria(criteriaToDelete.id);
+        setIsDeleteModalOpen(false);
+        setCriteriaToDelete(null);
+      } catch (error) {
+        console.error("Error deleting criteria:", error);
+        // You might want to show an error message to the user
+      } finally {
+        setDeletingId(null);
+      }
+    }
+  };
 
-  // const handleDeleteCancel = () => {
-  //   setIsDeleteModalOpen(false);
-  //   setCriteriaToDelete(null);
-  // };
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setCriteriaToDelete(null);
+  };
 
   // const handleRatingsClick = (criteria) => {
   //   // Navigate to sub-criteria page, optionally passing criteria ID as parameter
@@ -90,15 +86,15 @@ export default function CriteriaTable({
                         {criteria.type || "BENEFIT"}
                       </span>
                     </td>
-                    {/* <td>
-                      <div className="flex gap-2"> */}
-                    {/* <button
+                    <td>
+                      <div className="flex gap-2">
+                        {/* <button
                           className="btn btn-sm btn-outline btn-warning"
                           onClick={() => handleRatingsClick(criteria)}
                         >
                           Ratings
                         </button> */}
-                    {/* <button
+                        <button
                           className="btn btn-sm btn-outline btn-primary"
                           onClick={() => handleEditClick(criteria)}
                         >
@@ -114,9 +110,9 @@ export default function CriteriaTable({
                           ) : (
                             "Delete"
                           )}
-                        </button> */}
-                    {/* </div>
-                    </td> */}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -126,17 +122,17 @@ export default function CriteriaTable({
       </div>
 
       {/* Edit Criteria Modal */}
-      {/* {selectedCriteria && (
+      {selectedCriteria && (
         <EditCriteriaModal
           isOpen={isEditModalOpen}
           onClose={handleEditClose}
           onSave={handleEditSave}
           criteria={selectedCriteria}
         />
-      )} */}
+      )}
 
       {/* Delete Confirmation Modal */}
-      {/* <ConfirmationModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
@@ -145,7 +141,7 @@ export default function CriteriaTable({
         confirmText="Delete"
         cancelText="Cancel"
         isLoading={deletingId === criteriaToDelete?.id}
-      /> */}
+      />
     </>
   );
 }
